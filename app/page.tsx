@@ -1,103 +1,97 @@
-import Image from "next/image";
+"use client";
+
+import { useState, useEffect } from "react";
+import { Post } from "@/app/generated/prisma/client";
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+  useEffect(() => {
+    fetch("/api/posts")
+      .then((res) => res.json())
+      .then(setPosts);
+  }, []);
+
+  const addPost = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!title.trim()) return;
+
+    const res = await fetch("/api/posts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, content }),
+    });
+    const newPost = await res.json();
+    setPosts([...posts, newPost]);
+    setTitle("");
+    setContent("");
+  };
+
+  const deletePost = async (id: number) => {
+    await fetch(`/api/posts?id=${id}`, { method: "DELETE" });
+    setPosts(posts.filter((post) => post.id !== id));
+  };
+
+  return (
+    <div className="p-8 max-w-lg mx-auto">
+      <h1 className="text-3xl mb-8">NextJS + Prisma ORM + Prisma Postgres</h1>
+
+      <form onSubmit={addPost} className="mb-8">
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Title"
+          className="w-full bg-neutral-900 p-3 border border-neutral-700 rounded mb-3"
+        />
+        <textarea
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          placeholder="Content"
+          className="w-full bg-neutral-900 p-3 border border-neutral-700 rounded mb-3"
+        />
+        <button className="px-6 py-2 bg-blue-500 text-white rounded w-full hover:bg-blue-600 cursor-pointer">
+          Post
+        </button>
+      </form>
+
+      <div className="space-y-4">
+        {posts.length === 0 ? (
+          <div className="text-center py-8 text-neutral-400">
+            <p>No posts yet. Create your first post above!</p>
+          </div>
+        ) : (
+          posts.map((post) => (
+            <article
+              key={post.id}
+              className="group relative p-6 rounded-lg bg-neutral-900/50 hover:bg-neutral-800/50 transition-colors duration-200 border border-neutral-800 hover:border-neutral-700"
+            >
+              <div className="flex justify-between items-start">
+                <div className="flex-1 pr-4">
+                  <h3 className="text-lg font-semibold text-white mb-2">
+                    {post.title}
+                  </h3>
+                  {post.content && (
+                    <p className="text-neutral-300 text-sm leading-relaxed">
+                      {post.content}
+                    </p>
+                  )}
+                </div>
+                <button
+                  onClick={() => deletePost(post.id)}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-neutral-400 hover:text-red-400 p-2 -mt-1 -mr-2"
+                  aria-label="Delete post"
+                  title="Delete post"
+                >
+                  X
+                </button>
+              </div>
+            </article>
+          ))
+        )}
+      </div>
     </div>
   );
 }
