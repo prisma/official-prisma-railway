@@ -1,13 +1,15 @@
 import { execSync } from "node:child_process";
 import fs from "node:fs";
 
+if (process.env.DATABASE_URL) {
+  process.exit(0);
+}
+
 const log = {
   info: (msg) => console.log(`• ${msg}`),
   success: (msg) => console.log(`✓ ${msg}`),
   section: (msg) => console.log(`\n${msg}:`),
 };
-
-console.log(process.env.RAILWAY_PUBLIC_DOMAIN);
 
 const envPath = ".env";
 
