@@ -92,6 +92,7 @@ export default function Home() {
           ))
         )}
       </div>
+      <p>{process.env.RAILWAY_PUBLIC_DOMAIN}</p>
     </div>
   );
 }
