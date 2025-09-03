@@ -1,6 +1,10 @@
 import { execSync } from "node:child_process";
 import fs from "node:fs";
 
+if (process.env.DATABASE_URL) {
+  process.exit(0);
+}
+
 const log = {
   info: (msg) => console.log(`• ${msg}`),
   success: (msg) => console.log(`✓ ${msg}`),
@@ -28,7 +32,7 @@ fs.writeFileSync(
     `# Generated on ${new Date().toISOString()}`,
     `DATABASE_URL="${connectionString}"`,
     `DIRECT_URL="${directConnectionString}"`,
-    `# Claim: ${claimUrl}`,
+    `NEXT_PUBLIC_CLAIM_URL="${claimUrl}"`,
     `# Expires: ${deletionDate}`,
     "",
   ].join("\n")
@@ -36,11 +40,36 @@ fs.writeFileSync(
 
 log.success("Configured .env");
 
+const readmePath = new URL("../README.md", import.meta.url);
+let readmeContent = fs.readFileSync(readmePath, "utf-8");
+
+// Check if the Database Claim URL section exists
+const claimSectionRegex =
+  /## Database Claim URL\n\n\[create-db\.prisma\.io\/claim\]\([^)]*\)/s;
+
+if (claimSectionRegex.test(readmeContent)) {
+  // Update existing section
+  readmeContent = readmeContent.replace(
+    claimSectionRegex,
+    `## Database Claim URL\n\n[create-db.prisma.io/claim](${claimUrl})`
+  );
+} else {
+  // Append new section at the end of the file
+  const claimSection = `\n## Database Claim URL\n\n[create-db.prisma.io/claim](${claimUrl})`;
+  readmeContent = readmeContent.trimEnd() + "\n" + claimSection;
+}
+
+fs.writeFileSync(readmePath, readmeContent);
+log.success("Updated README.md with claim URL");
+
 try {
   log.section("Database setup");
-  execSync("npx prisma db push && npx prisma generate && npx prisma db seed", {
-    stdio: "inherit",
-  });
+  execSync(
+    "npx prisma db push && npx prisma generate --no-engine && npx prisma db seed",
+    {
+      stdio: "inherit",
+    }
+  );
   log.success("Database ready");
 } catch (error) {
   console.error("\nError:", error.message);

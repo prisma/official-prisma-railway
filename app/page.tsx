@@ -7,6 +7,7 @@ export default function Home() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const claimUrl = process.env.NEXT_PUBLIC_CLAIM_URL;
 
   useEffect(() => {
     fetch("/api/posts")
@@ -35,8 +36,10 @@ export default function Home() {
   };
 
   return (
-    <div className="p-8 max-w-lg mx-auto">
-      <h1 className="text-3xl mb-8">NextJS + Prisma ORM + Prisma Postgres</h1>
+    <div className="p-8 max-w-2xl mx-auto">
+      <h1 className="text-3xl mb-8 text-center">
+        NextJS + Prisma ORM + Prisma Postgres
+      </h1>
 
       <form onSubmit={addPost} className="mb-8">
         <input
@@ -92,6 +95,22 @@ export default function Home() {
           ))
         )}
       </div>
+      <footer className="mt-12 pt-6 border-t border-neutral-800">
+        <p className="text-center text-neutral-400 text-sm">
+          You can claim your database at{" "}
+          <a
+            href={claimUrl}
+            className="text-blue-400 hover:text-blue-300 transition-colors duration-200 break-all"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            create-db.prisma.io/claim
+          </a>
+        </p>
+        <p className="text-center text-neutral-500 text-xs mt-2">
+          Powered by Next.js, Prisma, and Railway
+        </p>
+      </footer>
     </div>
   );
 }
