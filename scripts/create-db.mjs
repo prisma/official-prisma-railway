@@ -7,6 +7,8 @@ const log = {
   section: (msg) => console.log(`\n${msg}:`),
 };
 
+console.log(process.env.RAILWAY_PUBLIC_DOMAIN);
+
 const envPath = ".env";
 
 if (fs.existsSync(envPath) && !process.argv.includes("--force")) {
@@ -38,9 +40,12 @@ log.success("Configured .env");
 
 try {
   log.section("Database setup");
-  execSync("npx prisma db push && npx prisma generate && npx prisma db seed", {
-    stdio: "inherit",
-  });
+  execSync(
+    "npx prisma db push && npx prisma generate --no-hints && npx prisma db seed",
+    {
+      stdio: "inherit",
+    }
+  );
   log.success("Database ready");
 } catch (error) {
   console.error("\nError:", error.message);
