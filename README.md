@@ -21,8 +21,6 @@ This is a [Next.js](https://nextjs.org/) app that uses [Prisma ORM](https://www.
 - Ready-to-use API routes
 - Modern Next.js App Router
 
-test commit to redeploy
-
 ## Quick Start
 
 1. Deploy using the Railway button above
