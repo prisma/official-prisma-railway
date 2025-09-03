@@ -12,7 +12,7 @@ tags:
 
 This is a [Next.js](https://nextjs.org/) app that uses [Prisma ORM](https://www.prisma.io/) with a [Prisma Postgres](https://www.prisma.io/postgres) database. The database is automatically provisioned and configured when you deploy the app.
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template/)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/dm0th-?referralCode=VQ09uv&utm_medium=integration&utm_source=template&utm_campaign=generic)
 
 ## Features
 
