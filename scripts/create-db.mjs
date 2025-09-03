@@ -43,18 +43,15 @@ log.success("Configured .env");
 const readmePath = new URL("../README.md", import.meta.url);
 let readmeContent = fs.readFileSync(readmePath, "utf-8");
 
-// Check if the Database Claim URL section exists
 const claimSectionRegex =
   /## Database Claim URL\n\n\[create-db\.prisma\.io\/claim\]\([^)]*\)/s;
 
 if (claimSectionRegex.test(readmeContent)) {
-  // Update existing section
   readmeContent = readmeContent.replace(
     claimSectionRegex,
     `## Database Claim URL\n\n[create-db.prisma.io/claim](${claimUrl})`
   );
 } else {
-  // Append new section at the end of the file
   const claimSection = `\n## Database Claim URL\n\n[create-db.prisma.io/claim](${claimUrl})`;
   readmeContent = readmeContent.trimEnd() + "\n" + claimSection;
 }
