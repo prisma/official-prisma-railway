@@ -19,19 +19,17 @@ if (fs.existsSync(envPath) && !process.argv.includes("--force")) {
 }
 
 log.section("Provisioning database");
-const { connectionString, directConnectionString, claimUrl, deletionDate } =
-  JSON.parse(
-    execSync("npx create-db@latest --json", {
-      stdio: ["ignore", "pipe", "inherit"],
-    }).toString()
-  );
+const { connectionString, claimUrl, deletionDate } = JSON.parse(
+  execSync("npx create-db@latest --json", {
+    stdio: ["ignore", "pipe", "inherit"],
+  }).toString()
+);
 
 fs.writeFileSync(
   envPath,
   [
     `# Generated on ${new Date().toISOString()}`,
     `DATABASE_URL="${connectionString}"`,
-    `DIRECT_URL="${directConnectionString}"`,
     `NEXT_PUBLIC_CLAIM_URL="${claimUrl}"`,
     `# Expires: ${deletionDate}`,
     "",
@@ -62,7 +60,7 @@ log.success("Updated README.md with claim URL");
 try {
   log.section("Database setup");
   execSync(
-    "npx prisma db push && npx prisma generate --no-engine && npx prisma db seed",
+    "npx prisma db push && npx prisma generate && npx prisma db seed",
     {
       stdio: "inherit",
     }

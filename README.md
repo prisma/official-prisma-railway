@@ -38,3 +38,7 @@ npm install
 # Start the development server
 npm run dev
 ```
+
+## Database Claim URL
+
+[create-db.prisma.io/claim](https://create-db.prisma.io/claim?projectID=proj_cml10zhfh00o92mfpfnfni6b6&utm_source=create-db&utm_medium=cli)
